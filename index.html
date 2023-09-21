@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jukebox</title>
+  <style>
+  	 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600&display=swap');
+  	#movableImage {
+            position: absolute;}
+
+    section, body, div {margin: 0; padding: 0;}
+    body {margin: 0;
+    overflow: hidden;  font-family: 'IBM Plex Mono', monospace;
+	background-image:url('https://media1.giphy.com/media/98fRKRZvMsNtSeMyxH/200w.webp?cid=ecf05e470z2m7trnc6gvzruzvgid6zpa2z3ymrdhxpq8pvms&ep=v1_gifs_search&rid=200w.webp&ct=g');}
+    .rel{position: relative;}
+    .ticker-text {
+    display: inline-block;
+    animation: ticker 15s linear infinite; /* 애니메이션 속성 설정 */
+    font-size: 30px; top:-20px;
+    color: black; 
+    position: absolute;
+	white-space: nowrap;}
+    .ticker-container{ width:100%; position: absolute; height: 60px;
+    background-color:lime;}
+    
+	.button{position:absolute; right:260px;;}
+@keyframes ticker {
+    0% {
+        transform: translateX(100%); /* 시작 위치 (오른쪽에서 시작) */
+    }
+    100% {
+        transform: translateX(-20%); /* 끝 위치 (왼쪽으로 이동) */
+    }
+
+}
+    .view {width: 100%; height: 100vh;}
+    .jukebox {
+      
+      height: 100vh;
+      background-size: 10%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+    .record {
+      width: 33%;
+      position: absolute; filter: drop-shadow(0 0 0.75rem lime); top:140px;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .note {
+      position: absolute;
+      z-index: 100;
+      width: 100px;
+      height: 100px;
+    }
+    .album, .record {
+    animation: rotate 10s linear infinite;
+    position: absolute;}
+    .album{top:270px;}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+	</style>
+</head>
+<body class=" rel">
+	<div class="ticker-container">
+        <div class="ticker-text">
+            <p>***NOW PLAYING... Rihanna - Phresh Out the Runway*** </p>
+        </div>
+    </div>
+  	 <section class="jukebox">
+    <img src="record.png" class="record">
+    <img src="note.png" class="note" id="note1">
+    <img src="note.png" class="note" id="note2">
+    <img src="note.png" class="note" id="note3">
+    <img src="phresh.jpg" id="phresh" class="album" style="width:300px;">
+    <audio id="phreshmp3">
+      <source src="Phresh Out The Runway.mp3" type="audio/mpeg">
+    </audio>
+    <img src="button.png" id="button" class="button">
+  </section>
+
+  <script>
+    function setInitialNotePositionAndColor(noteId) {
+      var note = document.getElementById(noteId);
+
+      /*랜덤 좌표*/
+      var maxX = window.innerWidth - note.width;
+      var maxY = window.innerHeight - note.height;
+      var randomX = Math.floor(Math.random() * maxX);
+      var randomY = Math.floor(Math.random() * maxY);
+
+      
+
+      /*처음 위치*/
+      note.style.left = randomX + "px";
+      note.style.top = randomY + "px";
+
+      }
+
+    /*클릭 시 위치 색상*/
+    window.addEventListener("load", function () {
+      setInitialNotePositionAndColor("note1");
+      setInitialNotePositionAndColor("note2");
+      setInitialNotePositionAndColor("note3");
+    });
+
+    /*클릭 시 랜덤 위치 색상*/
+    function moveNoteRandomly(noteId) {
+      var note = document.getElementById(noteId);
+
+      /*랜덤한 X와 Y 좌표*/
+      var maxX = window.innerWidth - note.width;
+      var maxY = window.innerHeight - note.height;
+      var randomX = Math.floor(Math.random() * maxX);
+      var randomY = Math.floor(Math.random() * maxY);
+
+      
+
+      note.style.left = randomX + "px";
+      note.style.top = randomY + "px";
+
+      note.style.backgroundColor = randomColor;
+    }
+
+    document.getElementById("note1").addEventListener("click", function () {
+      moveNoteRandomly("note1");
+    });
+    document.getElementById("note2").addEventListener("click", function () {
+      moveNoteRandomly("note2");
+    });
+    document.getElementById("note3").addEventListener("click", function () {
+      moveNoteRandomly("note3");
+    });
+    /*흐르는 텍스트*/
+    bhTicker("ticker", 2);
+
+    function bhTicker(cl, speed) {
+      let t = document.getElementsByClassName(cl);
+      let ta = [];
+      let ts = [];
+      let tg = [];
+      let tw = [];
+      let container, mover, text, textWidth;
+
+      for (let i = 0; i < t.length; i++) {
+        container = t[i];
+        mover = container.getElementsByTagName("p").item(0);
+        text = mover.getElementsByTagName("span").item(0);
+
+        // set
+        mover.style.position = "absolute";
+        mover.style.margin = "0 0 0 0";
+        mover.style.left = "0px";
+        mover.leftPosition = 0;
+        mover.style.width = text.childNodes.item(0).length + "em"; // stretch width
+        textWidth = text.offsetWidth;
+
+        let speed2 = t[i].dataset.speed;
+        if (textWidth > container.offsetWidth) {
+          if (speed2 == 1) {
+            speed2 = 2;
+          }
+          mover.style.width = textWidth * speed2 + "px";
+
+          for (let k = 0; k < speed2; k++) {
+            mover.innerHTML += mover.innerHTML;
+          }
+        }
+
+        tw.push(textWidth);
+        tg.push(t[i].dataset.gap);
+        ts.push(t[i].dataset.speed);
+        ta.push(mover);
+      }
+
+      let tickerAction = function () {
+        for (let j = 0; j < ta.length; j++) {
+          let speed = parseInt(ts[j]);
+          let gap = parseInt(tg[j]);
+          let tw2 = tw[j];
+
+          if (ta[j].leftPosition * -speed > tw2 * speed) {
+            ta[j].leftPosition = -speed;
+          } else {
+            ta[j].leftPosition -= speed;
+          }
+
+          ta[j].style.left = (-gap + ta[j].leftPosition) + "px";
+        }
+        window.requestAnimationFrame(tickerAction);
+      };
+      tickerAction();
+    }
+
+    // Phresh 이미지를 클릭했을 때 오디오 재생 및 일시 정지 함수
+    document.getElementById("phresh").addEventListener("click", function () {
+      // ...
+    });
+
+    
+    
+    
+    // 버튼 요소 가져오기
+    var button = document.getElementById("button");
+
+    // 텍스트와 이미지에 사용할 데이터 배열
+    var songData = [
+      {
+        text: "***NOW PLAYING...Flume - Smoke & Retribution feat. Vince Staples & Kučka***",
+        imageSrc: "smoke.jpg",
+        audioSrc: "smoke.mp3"
+      },
+       {
+        text: "***NOW PLAYING...50Cent - InDaClub***",
+        imageSrc: "indaclub.jpg",
+        audioSrc: "indaclub.mp3"
+      },
+	{
+        text: "***NOW PLAYING...David Guetta & Afrojack - Dirty Sexy Money feat. Charli XCX & French Montana***",
+        imageSrc: "dirtysexy.jpg",
+        audioSrc: "dirty.mp3"
+      },
+    {
+        text: "***NOW PLAYING...DJ Snake, Lauv - A Different Way***",
+        imageSrc: "adifferent.jpg",
+        audioSrc: "A Different Way.mp3"
+      },
+      {
+        text: "***Anne-Marie - Alarm (Marshmello Remix)***",
+        imageSrc: "alarm.jpg",
+        audioSrc: "Alarm.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Taio Cruz - Break Your Heart ft. Ludacris***",
+        imageSrc: "breakyour.jpg",
+        audioSrc: "Break Your Heart.mp3"
+      },
+      {
+        text: "***Flume feat. Oklou - Highest Building***",
+        imageSrc: "highest.jpg",
+        audioSrc: "Highest Building.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Taylor Swift - …Ready For It?***",
+        imageSrc: "readyfor.jpg",
+        audioSrc: "Ready For It.mp3"
+      },
+      {
+        text: "***NOW PLAYING...5 Seconds of Summer - Want You Back***",
+        imageSrc: "wantyou.jpg",
+        audioSrc: "Want You Back.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Ke$ha - Your Love Is My Drug***",
+        imageSrc: "yourlove.jpg",
+        audioSrc: "Your.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Flo Rida - Whistle***",
+        imageSrc: "whistle.jpg",
+        audioSrc: "Whistle.mp3"
+      },
+      {
+        text: "***A$AP Rocky - Praise The Lord (Da Shine) (Official Video) ft. Skepta***",
+        imageSrc: "praise.jpg",
+        audioSrc: "Praise The Lord.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Eminem - Venom***",
+        imageSrc: "venom.jpg",
+        audioSrc: "Venom.mp3"
+      },
+
+      {
+        text: "***NOW PLAYING...Doja Cat - Like That (Official Video) ft. Gucci Mane***",
+        imageSrc: "likethat.jpg",
+        audioSrc: "Like That.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Steve Aoki - Lie To Me feat. Ina Wroldsen***",
+        imageSrc: "lietome.jpg",
+        audioSrc: "Lie To Me.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Chris Brown - Kiss Kiss (Feat. T-Pain)***",
+        imageSrc: "kisskiss.jpg",
+        audioSrc: "Kiss Kiss.mp3"
+      },
+
+     {
+        text: "***NOW PLAYING...Dawin - Dessert ft. Silentó***",
+        imageSrc: "dessert.jpg",
+        audioSrc: "Dessert.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Bebe Rexha - Die For A Man (feat. Lil Uzi Vert)***",
+        imageSrc: "diefor.jpg",
+        audioSrc: "Die For a Man.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Flo Rida - GDFR ft. Sage The Gemini and Lookas***",
+        imageSrc: "gdfr.jpg",
+        audioSrc: "GDFR.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Ariana Grande - Into You ***",
+        imageSrc: "intoyou.jpg",
+        audioSrc: "into you.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Maroon 5 - Maps***",
+        imageSrc: "maps.jpg",
+        audioSrc: "Maps.mp3"
+      },
+      {
+        text: "***NOW PLAYING...SHY Martin - Forget To Forget ***",
+        imageSrc: "forget.jpg",
+        audioSrc: "Forget to Forget.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Flume - beat 58 1.1 [2020 Export Wav]***",
+        imageSrc: "beat.jpg",
+        audioSrc: "beat 58.mp3"
+      },
+      {
+        text: "***NOW PLAYING...5 Seconds of Summer - BLENDER***",
+        imageSrc: "blender.jpg",
+        audioSrc: "BLENDER.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Sub Urban & DNMO - Broken***",
+        imageSrc: "broken.jpg",
+        audioSrc: "Broken.mp3"
+      },
+      {
+        text: "***NOW PLAYING...DJ Snake - Let Me Love You ft. Justin Bieber***",
+        imageSrc: "letmelove.jpg",
+        audioSrc: "Let Me Love You.mp3"
+      },
+      {
+        text: "***Katy Perry - E.T. ft. Kanye West***",
+        imageSrc: "et.jpg",
+        audioSrc: "ET.mp3"
+      },
+      {
+        text: "***NOW PLAYING...Maroon 5 - Animals***",
+        imageSrc: "animals.jpg",
+        audioSrc: "Animals.mp3"
+      },
+
+      // 여러 곡에 대한 데이터를 추가할 수 있습니다.
+    ];
+
+    // 현재 곡의 인덱스 추적
+    var currentSongIndex = 0;
+
+    // 버튼 클릭 이벤트 리스너 추가
+    button.addEventListener("click", function () {
+      // 다음 곡으로 이동
+      currentSongIndex = (currentSongIndex + 1) % songData.length;
+
+      // 텍스트 변경
+      var tickerText = document.querySelector(".ticker-text p");
+      tickerText.textContent = songData[currentSongIndex].text;
+
+      // 이미지 변경
+      var phreshImage = document.getElementById("phresh");
+      phreshImage.src = songData[currentSongIndex].imageSrc;
+
+      // 오디오 변경
+      var phreshAudio = document.getElementById("phreshmp3");
+      phreshAudio.src = songData[currentSongIndex].audioSrc;
+      phreshAudio.load();
+
+      // 오디오 재생
+      phreshAudio.play();
+    });
+    // Phresh 이미지를 클릭했을 때 오디오 재생 및 일시 정지 함수
+document.getElementById("phresh").addEventListener("click", function () {
+  var audio = document.getElementById("phreshmp3");
+  if (audio.paused) {
+    audio.play(); // 오디오를 재생합니다.
+  } else {
+    audio.pause(); // 오디오를 일시 정지합니다.
+  }
+});
+
+  </script>
+</body>
+</html>
